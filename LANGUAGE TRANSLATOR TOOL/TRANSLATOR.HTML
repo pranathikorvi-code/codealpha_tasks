@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Universal Translation Tool</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .window {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            width: 550px;
+        }
+        h2 { text-align: center; color: #333; margin-top: 0; }
+        .box-group { display: flex; gap: 15px; margin-bottom: 15px; }
+        .column { flex: 1; display: flex; flex-direction: column; }
+        label { font-weight: bold; margin-bottom: 5px; color: #666; }
+        select, textarea {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        textarea { resize: none; height: 120px; }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+        button:hover { background-color: #0056b3; }
+        .copy-btn { background-color: #6c757d; }
+        .copy-btn:hover { background-color: #5a6268; }
+    </style>
+</head>
+<body>
+
+<div class="window">
+    <h2>Language Translation Tool</h2>
+    
+    <div class="box-group">
+        <div class="column">
+            <label>Translate From:</label>
+            <select id="srcLang">
+                <option value="en" selected>English</option>
+                <option value="es">Spanish (Español)</option>
+                <option value="fr">French (Français)</option>
+                <option value="de">German (Deutsch)</option>
+                <option value="ja">Japanese (日本語)</option>
+                <option value="zh">Chinese (中文)</option>
+                <option value="ar">Arabic (العربية)</option>
+                <option value="ru">Russian (Русский)</option>
+                <option value="hi">Hindi (हिन्दी)</option>
+                <option value="bn">Bengali (বাংলা)</option>
+                <option value="te">Telugu (తెలుగు)</option>
+                <option value="mr">Marathi (मराठी)</option>
+                <option value="ta">Tamil (தமிழ்)</option>
+                <option value="ur">Urdu (اردو)</option>
+                <option value="gu">Gujarati (ગુજરાતી)</option>
+                <option value="kn">Kannada (ಕನ್ನಡ)</option>
+            </select>
+            <textarea id="srcText" placeholder="Type your sentence here..."></textarea>
+        </div>
+
+        <div class="column">
+            <label>Translate To:</label>
+            <select id="tgtLang">
+                <option value="es" selected>Spanish (Español)</option>
+                <option value="en">English</option>
+                <option value="fr">French (Français)</option>
+                <option value="de">German (Deutsch)</option>
+                <option value="ja">Japanese (日本語)</option>
+                <option value="zh">Chinese (中文)</option>
+                <option value="ar">Arabic (العربية)</option>
+                <option value="ru">Russian (Русский)</option>
+                <option value="hi">Hindi (हिन्दी)</option>
+                <option value="bn">Bengali (বাংলা)</option>
+                <option value="te">Telugu (తెలుగు)</option>
+                <option value="mr">Marathi (मराठी)</option>
+                <option value="ta">Tamil (தமிழ்)</option>
+                <option value="ur">Urdu (اردو)</option>
+                <option value="gu">Gujarati (ગુજરાતી)</option>
+                <option value="kn">Kannada (ಕನ್ನಡ)</option>
+            </select>
+            <textarea id="tgtText" placeholder="Translation will appear here..." readonly style="background-color: #e9ecef;"></textarea>
+        </div>
+    </div>
+
+    <button onclick="startTranslation()">Translate Now</button>
+    <button class="copy-btn" onclick="copyClipboard()">📋 Copy Translation</button>
+</div>
+
+<script>
+async function startTranslation() {
+    const text = document.getElementById("srcText").value.trim();
+    const src = document.getElementById("srcLang").value;
+    const tgt = document.getElementById("tgtLang").value;
+    const output = document.getElementById("tgtText");
+
+    if (!text) {
+        alert("Please enter some text first!");
+        return;
+    }
+
+    output.value = "Translating...";
+
+    try {
+        // High accuracy engine linked straight to Google translation systems
+        const res = await fetch(`https://lingva.ml/api/v1/${src}/${tgt}/${encodeURIComponent(text)}`);
+        const data = await res.json();
+        
+        if(data.translation) {
+            output.value = data.translation;
+        } else {
+            output.value = "Error with translation server.";
+        }
+    } catch (e) {
+        alert("Connection failed. Trying backup database...");
+        try {
+            const backupRes = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${src}|${tgt}`);
+            const backupData = await backupRes.json();
+            output.value = backupData.responseData.translatedText;
+        } catch(err) {
+            output.value = "Translation failed.";
+        }
+    }
+}
+
+function copyClipboard() {
+    const text = document.getElementById("tgtText").value;
+    if(text && text !== "Translating...") {
+        navigator.clipboard.writeText(text);
+        alert("Copied to clipboard successfully!");
+    } else {
+        alert("Nothing to copy yet.");
+    }
+}
+</script>
+
+</body>
+</html>
