@@ -1,4 +1,4 @@
-# Astral-Logic Tasks
+# CodeAlpha Internship Portfolio Tasks
 
 Welcome to my official CodeAlpha project repository. This collection contains three independent production-grade solutions demonstrating advancements across **Computer Vision (CV)**, **Natural Language Processing (NLP)**, and **Web-API Integrations**.
 
